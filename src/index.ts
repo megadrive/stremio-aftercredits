@@ -88,13 +88,13 @@ app.get("/stream/movie/:id", async (c) => {
   );
 
   const streams: Stream[] = scrapeResult.stingers.map((stinger, index) => {
-    const note = stinger.note ? ` (${stinger.note})` : "";
     return {
       title: stinger.type.replace(/-/g, " "),
       externalUrl: scrapeResult.link,
     };
   });
 
+  c.header("Cache-Control", "public, max-age=86400"); // cache for 1 day
   return c.json({ streams });
 });
 
