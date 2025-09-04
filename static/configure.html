@@ -12,13 +12,16 @@
     style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif;">
     <h1 style="margin-bottom: 2rem;">aftercredits</h1>
     <div style="display: flex; gap: 1rem;">
-      <button style="margin: 0.5rem; padding: 0.75rem 2rem; font-size: 1rem;"
-        onclick="window.location.href='stremio://aftercredits.almosteffective.com/manifest.json'">Install</button>
-      <button style="margin: 0.5rem; padding: 0.75rem 2rem; font-size: 1rem;"
-        onclick="window.location.href='https://web.stremio.com/#/addons?addon=https%3A%2F%2Faftercredits.almosteffective.com%2Fmanifest.json'">Install
-        (web)</button>
-      <button style="margin: 0.5rem; padding: 0.75rem 2rem; font-size: 1rem;"
-        onclick="navigator.clipboard.writeText('https://aftercredits.almosteffective.com/manifest.json')">Copy</button>
+      <a style="margin: 0.5rem; padding: 0.75rem 2rem; font-size: 1rem; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
+        onmouseover="this.style.backgroundColor='#45a049'" onmouseout="this.style.backgroundColor='#4CAF50'"
+        href="stremio://aftercredits.almosteffective.com/manifest.json">Install</a>
+      <a style="margin: 0.5rem; padding: 0.75rem 2rem; font-size: 1rem; background-color: #2196F3; color: white; text-decoration: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
+        onmouseover="this.style.backgroundColor='#1976D2'" onmouseout="this.style.backgroundColor='#2196F3'"
+        href="https://web.stremio.com/#/addons?addon=https%3A%2F%2Faftercredits.almosteffective.com%2Fmanifest.json">Install
+        (web)</a>
+      <a style="margin: 0.5rem; padding: 0.75rem 2rem; font-size: 1rem; background-color: #9E9E9E; color: white; text-decoration: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
+        onmouseover="this.style.backgroundColor='#757575'" onmouseout="this.style.backgroundColor='#9E9E9E'"
+        onclick="navigator.clipboard.writeText('https://aftercredits.almosteffective.com/manifest.json')">Copy</a>
     </div>
   </div>
 </body>
