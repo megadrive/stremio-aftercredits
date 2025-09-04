@@ -80,6 +80,18 @@ app.get("/stream/movie/:id", async (c) => {
 
   if (!scrapeResult) {
     console.info(`No aftercredits info found for ${query}`);
+
+    // debug
+    // if (true) {
+    //   const streams: Stream = {
+    //     name: "After Credits",
+    //     title: "No stingers found",
+    //     externalUrl: "https://aftercredits.almosteffective.com",
+    //   };
+
+    //   return c.json({ streams });
+    // }
+
     return c.json({ streams: [] });
   }
 
@@ -87,15 +99,21 @@ app.get("/stream/movie/:id", async (c) => {
     `Found aftercredits info for ${query}: ${JSON.stringify(scrapeResult)}`
   );
 
-  const streams: Stream[] = scrapeResult.stingers.map((stinger, index) => {
-    return {
-      title: stinger.type.replace(/-/g, " "),
-      externalUrl: scrapeResult.link,
-    };
-  });
+  let stingers = "";
+  for (const stinger of scrapeResult.stingers) {
+    stingers += `- ${stinger.type.replace(/-/g, " ")}\n`;
+  }
 
-  c.header("Cache-Control", "public, max-age=86400"); // cache for 1 day
-  return c.json({ streams });
+  const streams: Stream = {
+    name: "After Credits",
+    title: `💚 Stick around for:\n${stingers.trim()}`,
+    externalUrl: scrapeResult.link,
+  };
+
+  if (process.env.NODE_ENV === "production") {
+    c.header("Cache-Control", "public, max-age=86400"); // cache for 1 day
+  }
+  return c.json({ streams: [streams] });
 });
 
 serve(
