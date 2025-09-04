@@ -1,0 +1,171 @@
+import { to } from "await-to-js";
+import { load } from "cheerio";
+import fetch from "ky";
+
+type ScraperOptions = {
+  name: string;
+  baseUrl: string;
+  timeout?: number;
+  retries?: number;
+  userAgent?: string;
+};
+
+type StingerType = "post-credit-scene" | "mid-credit-scene";
+type Stinger = { type: StingerType; note?: string };
+type ScraperResult = {
+  title: string;
+  link: string;
+  stingers: Stinger[];
+};
+
+/**
+ * Fetch HTML content from a given URL
+ * @param url - URL to fetch HTML from
+ * @returns HTML as a string or throws an Error if the fetch fails
+ */
+async function fetchHtml(url: string): Promise<string> {
+  const [htmlErr, html] = await to(fetch(url).then((res) => res.text()));
+  if (htmlErr) {
+    if (htmlErr.name === "TimeoutError") {
+      throw new Error(`Request to ${url} timed out`);
+    }
+
+    throw new Error(`Failed to fetch HTML from ${url}`);
+  }
+  return html;
+}
+
+class BaseScraper {
+  options: ScraperOptions;
+  paths: { [key: string]: string } = {};
+
+  constructor(options: ScraperOptions) {
+    this.options = Object.assign(
+      {
+        timeout: 5000,
+        retries: 3,
+        userAgent: "Stremio-AfterCredits-Scraper/1.0",
+      },
+      options
+    );
+  }
+
+  path(pathKey: string): string {
+    return (
+      this.options.baseUrl + this.paths[pathKey as keyof typeof this.path] || ""
+    );
+  }
+
+  log(message: string) {
+    console.log(`[AfterCreditsScraper] ${message}`);
+  }
+
+  // Placeholder for common scraper methods and properties
+  async scrape(query: string): Promise<ScraperResult | null> {
+    throw new Error("Method not implemented.");
+  }
+}
+
+export class AfterCreditsScraper extends BaseScraper {
+  paths = {
+    search: "/?s=%s",
+  };
+
+  constructor() {
+    super({
+      name: "AfterCredits",
+      baseUrl: "https://aftercredits.com",
+    });
+  }
+
+  async scrape(query: string): Promise<ScraperResult | null> {
+    const searchUrl = this.path("search").replace(
+      "%s",
+      encodeURIComponent(query)
+    );
+
+    const result: ScraperResult = {
+      title: "",
+      link: "",
+      stingers: [],
+    };
+
+    const [htmlErr, html] = await to(fetchHtml(searchUrl));
+
+    if (htmlErr) {
+      console.error(
+        `Error fetching HTML from ${searchUrl}: ${htmlErr.message}`
+      );
+
+      return null;
+    }
+
+    console.info(`Fetched HTML from ${searchUrl}. Length: ${html.length}`);
+
+    const $ = load(html);
+    const $results = $("h3.entry-title");
+    console.debug(`Found ${$results.length} results for query: ${query}`);
+    const results = $results.filter((i, el) => {
+      const title = $(el).text().toLowerCase();
+      return title.trim().endsWith("*");
+    });
+
+    if (results.length === 0) {
+      console.info(`No results found for query: ${query}`);
+      return null;
+    }
+    // fetch the href of the first result for more details
+    const firstResult = results.first();
+    const href = firstResult.find("a").attr("href");
+    if (!href) {
+      console.info(`No href found for the first result of query: ${query}`);
+      return null;
+    }
+
+    result.link = href;
+    result.title = firstResult
+      .text()
+      .replace(/[\*|\?]$/, "")
+      .trim();
+
+    const stingerExists = firstResult.text().includes("*");
+
+    if (!stingerExists) {
+      // early exit, no stingers, no need to do a detail fetch
+      console.warn("early exit, no stingers, no need to do a detail fetch");
+      return result;
+    }
+
+    // grab details
+    const [detailHtmlErr, detailHtml] = await to(fetchHtml(href));
+
+    if (detailHtmlErr) {
+      throw new Error(`Failed to fetch detail HTML from ${href}`);
+    }
+
+    const $$ = load(detailHtml);
+
+    const $$spoilers = $$(".spoiler-wrap");
+    console.info(`Found ${$$spoilers.length} spoilers for ${result.title}`);
+
+    $$spoilers.each((i, el) => {
+      const stinger: Stinger = { type: "post-credit-scene" }; // make an assumption
+
+      const $$when = $$(el).find(".spoiler-head").text().trim().toLowerCase();
+      if ($$when.includes("during the credits")) {
+        stinger.type = "mid-credit-scene";
+      }
+
+      const $$details = $$(el).find(".spoiler-body").text().trim();
+      if ($$details && $$details.length > 0) {
+        stinger.note = $$details;
+      }
+
+      console.info(`Found stinger: ${JSON.stringify(stinger)}`);
+
+      result.stingers.push(stinger);
+    });
+
+    return result;
+  }
+}
