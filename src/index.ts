@@ -1,5 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { cors } from "hono/cors";
 import { manifest } from "./manifest.js";
 import type { Stream } from "stremio-addon-sdk";
@@ -9,11 +10,22 @@ import { z } from "zod";
 import { AfterCreditsScraper } from "./scraper.js";
 const afterCredits = new AfterCreditsScraper();
 
-const app = new Hono();
+const app = new Hono({ strict: false });
 app.use("*", cors());
 
+app.use(
+  "*",
+  serveStatic({
+    root: "./static",
+  })
+);
+
 app.get("/", (c) => {
-  return c.text("Hello Hono!");
+  return c.redirect("/configure.html");
+});
+
+app.get("/configure", (c) => {
+  return c.redirect("/configure.html");
 });
 
 app.get("/manifest.json", (c) => {
