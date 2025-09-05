@@ -8,8 +8,8 @@ import { to } from "await-to-js";
 import ky from "ky";
 import { z } from "zod";
 import { AfterCreditsScraper, MediaStingerScraper } from "./scraper.js";
-const afterCredits = new AfterCreditsScraper();
-const mediaStinger = new MediaStingerScraper();
+
+const SOURCES = [new AfterCreditsScraper(), new MediaStingerScraper()];
 
 const app = new Hono({ strict: false });
 app.use("*", cors());
@@ -43,44 +43,16 @@ const CinemetaResponseSchema = z.object({
 
 // scrape all sources for a given query in sequence
 async function scrapeAll(query: string) {
-  let [afterCreditsErr, afterCreditsResult] = await to(
-    afterCredits.scrape(query)
-  );
-
-  if (afterCreditsErr) {
-    console.error(
-      `Error scraping AfterCredits for ${query}: ${afterCreditsErr}`
-    );
-    return null;
-  }
-
-  if (afterCreditsResult) {
-    console.info(
-      `Found aftercredits info for ${query}: ${JSON.stringify(
-        afterCreditsResult
-      )}`
-    );
-    return afterCreditsResult;
-  }
-
-  let [mediaStingerErr, mediaStingerResult] = await to(
-    mediaStinger.scrape(query)
-  );
-
-  if (mediaStingerErr) {
-    console.error(
-      `Error scraping MediaStinger for ${query}: ${mediaStingerErr}`
-    );
-    return null;
-  }
-
-  if (mediaStingerResult) {
-    console.info(
-      `Found mediastinger info for ${query}: ${JSON.stringify(
-        mediaStingerResult
-      )}`
-    );
-    return mediaStingerResult;
+  for (const source of SOURCES) {
+    let [err, result] = await to(source.scrape(query));
+    if (err) {
+      console.error(`Error scraping ${query} from ${source.constructor.name}`);
+      console.error(err);
+      continue;
+    }
+    if (result) {
+      return result;
+    }
   }
 
   console.info(`No aftercredits info found for ${query}`);
