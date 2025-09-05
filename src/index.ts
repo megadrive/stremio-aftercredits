@@ -7,8 +7,9 @@ import type { Stream } from "stremio-addon-sdk";
 import { to } from "await-to-js";
 import ky from "ky";
 import { z } from "zod";
-import { AfterCreditsScraper } from "./scraper.js";
+import { AfterCreditsScraper, MediaStingerScraper } from "./scraper.js";
 const afterCredits = new AfterCreditsScraper();
+const mediaStinger = new MediaStingerScraper();
 
 const app = new Hono({ strict: false });
 app.use("*", cors());
@@ -39,6 +40,53 @@ const CinemetaResponseSchema = z.object({
     releaseInfo: z.coerce.string().optional(),
   }),
 });
+
+// scrape all sources for a given query in sequence
+async function scrapeAll(query: string) {
+  let [afterCreditsErr, afterCreditsResult] = await to(
+    afterCredits.scrape(query)
+  );
+
+  if (afterCreditsErr) {
+    console.error(
+      `Error scraping AfterCredits for ${query}: ${afterCreditsErr}`
+    );
+    return null;
+  }
+
+  if (afterCreditsResult) {
+    console.info(
+      `Found aftercredits info for ${query}: ${JSON.stringify(
+        afterCreditsResult
+      )}`
+    );
+    return afterCreditsResult;
+  }
+
+  let [mediaStingerErr, mediaStingerResult] = await to(
+    mediaStinger.scrape(query)
+  );
+
+  if (mediaStingerErr) {
+    console.error(
+      `Error scraping MediaStinger for ${query}: ${mediaStingerErr}`
+    );
+    return null;
+  }
+
+  if (mediaStingerResult) {
+    console.info(
+      `Found mediastinger info for ${query}: ${JSON.stringify(
+        mediaStingerResult
+      )}`
+    );
+    return mediaStingerResult;
+  }
+
+  console.info(`No aftercredits info found for ${query}`);
+  return null;
+}
+
 app.get("/stream/movie/:id", async (c) => {
   const { id } = c.req.param();
 
@@ -71,26 +119,10 @@ app.get("/stream/movie/:id", async (c) => {
   // get aftercredits details
   const { meta } = parseResult.data;
   const query = `${meta.name} ${meta.releaseInfo ?? ""}`.trim();
-  const [scrapeErr, scrapeResult] = await to(afterCredits.scrape(query));
-
-  if (scrapeErr) {
-    console.error(`Error scraping AfterCredits for ${query}: ${scrapeErr}`);
-    return c.json({ streams: [] });
-  }
+  let [_err, scrapeResult] = await to(scrapeAll(query));
 
   if (!scrapeResult) {
     console.info(`No aftercredits info found for ${query}`);
-
-    // debug
-    // if (true) {
-    //   const streams: Stream = {
-    //     name: "After Credits",
-    //     title: "No stingers found",
-    //     externalUrl: "https://aftercredits.almosteffective.com",
-    //   };
-
-    //   return c.json({ streams });
-    // }
 
     return c.json({ streams: [] });
   }
