@@ -9,10 +9,7 @@ import ky from "ky";
 import { z } from "zod";
 import { afterCreditsScraper, mediaStingerScraper } from "./scraper.js";
 
-const SOURCES = [
-  // afterCreditsScraper,
-  mediaStingerScraper,
-];
+const SOURCES = [afterCreditsScraper, mediaStingerScraper];
 
 const app = new Hono({ strict: false });
 app.use("*", cors());
@@ -99,6 +96,11 @@ app.get("/stream/movie/:id", async (c) => {
   if (!scrapeResult) {
     console.info(`No aftercredits info found for ${query}`);
 
+    return c.json({ streams: [] });
+  }
+
+  if (scrapeResult.stingers.length === 0) {
+    console.info(`No stingers found for ${query}`);
     return c.json({ streams: [] });
   }
 
