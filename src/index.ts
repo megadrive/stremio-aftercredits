@@ -7,9 +7,12 @@ import type { Stream } from "stremio-addon-sdk";
 import { to } from "await-to-js";
 import ky from "ky";
 import { z } from "zod";
-import { AfterCreditsScraper, MediaStingerScraper } from "./scraper.js";
+import { afterCreditsScraper, mediaStingerScraper } from "./scraper.js";
 
-const SOURCES = [new AfterCreditsScraper(), new MediaStingerScraper()];
+const SOURCES = [
+  // afterCreditsScraper,
+  mediaStingerScraper,
+];
 
 const app = new Hono({ strict: false });
 app.use("*", cors());
@@ -105,12 +108,12 @@ app.get("/stream/movie/:id", async (c) => {
 
   let stingers = "";
   for (const stinger of scrapeResult.stingers) {
-    stingers += `- ${stinger.type.replace(/-/g, " ")}\n`;
+    stingers += `💚 ${stinger.type.replace(/-/g, " ")}\n`;
   }
 
   const streams: Stream = {
     name: "After Credits",
-    title: `💚 Stick around for:\n${stingers.trim()}`,
+    title: `Stick around for:\n${stingers.trim()}`,
     externalUrl: scrapeResult.link,
   };
 

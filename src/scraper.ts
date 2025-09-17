@@ -61,12 +61,12 @@ class BaseScraper {
   }
 
   // Placeholder for common scraper methods and properties
-  async scrape(query: string): Promise<ScraperResult | null> {
+  async scrape(query: string): Promise<ScraperResult | undefined> {
     throw new Error("Method not implemented.");
   }
 }
 
-export class AfterCreditsScraper extends BaseScraper {
+class AfterCreditsScraper extends BaseScraper {
   paths = {
     search: "/?s=%s",
   };
@@ -78,7 +78,7 @@ export class AfterCreditsScraper extends BaseScraper {
     });
   }
 
-  async scrape(query: string): Promise<ScraperResult | null> {
+  async scrape(query: string): Promise<ScraperResult | undefined> {
     const searchUrl = this.path("search").replace(
       "%s",
       encodeURIComponent(query)
@@ -97,7 +97,7 @@ export class AfterCreditsScraper extends BaseScraper {
         `Error fetching HTML from ${searchUrl}: ${htmlErr.message}`
       );
 
-      return null;
+      return undefined;
     }
 
     console.info(`Fetched HTML from ${searchUrl}. Length: ${html.length}`);
@@ -112,14 +112,14 @@ export class AfterCreditsScraper extends BaseScraper {
 
     if (results.length === 0) {
       console.info(`No results found for query: ${query}`);
-      return null;
+      return undefined;
     }
     // fetch the href of the first result for more details
     const firstResult = results.first();
     const href = firstResult.find("a").attr("href");
     if (!href) {
       console.info(`No href found for the first result of query: ${query}`);
-      return null;
+      return undefined;
     }
 
     result.link = href;
@@ -169,20 +169,21 @@ export class AfterCreditsScraper extends BaseScraper {
     return result;
   }
 }
+export const afterCreditsScraper = new AfterCreditsScraper();
 
-export class MediaStingerScraper extends BaseScraper {
+class MediaStingerScraper extends BaseScraper {
   paths = {
     search: "/?tab=MOVIES&s=%s",
   };
 
   constructor() {
     super({
-      name: "AfterCredits",
+      name: "MediaStinger",
       baseUrl: "http://www.mediastinger.com",
     });
   }
 
-  async scrape(query: string): Promise<ScraperResult | null> {
+  async scrape(query: string): Promise<ScraperResult | undefined> {
     const searchUrl = this.path("search").replace(
       "%s",
       encodeURIComponent(query)
@@ -201,7 +202,7 @@ export class MediaStingerScraper extends BaseScraper {
         `Error fetching HTML from ${searchUrl}: ${htmlErr.message}`
       );
 
-      return null;
+      return undefined;
     }
 
     console.info(`Fetched HTML from ${searchUrl}. Length: ${html.length}`);
@@ -212,7 +213,7 @@ export class MediaStingerScraper extends BaseScraper {
 
     if ($result.length === 0) {
       console.info(`No results found for query: ${query}`);
-      return null;
+      return undefined;
     }
 
     result.link = $result.find("a").first().prop("href") ?? "";
@@ -241,3 +242,4 @@ export class MediaStingerScraper extends BaseScraper {
     return result;
   }
 }
+export const mediaStingerScraper = new MediaStingerScraper();
