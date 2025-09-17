@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "stremio:publish": "tsx src/publishToStremio.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
