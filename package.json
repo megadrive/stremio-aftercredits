@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
+    "@keyv/sqlite": "^4.0.5",
     "await-to-js": "^3.0.0",
     "cheerio": "^1.1.2",
     "hono": "^4.9.6",
+    "keyv": "^5.5.2",
     "ky": "^1.9.1",
     "zod": "^4.1.5"
   },

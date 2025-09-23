@@ -12,7 +12,7 @@ type ScraperOptions = {
 
 type StingerType = "post-credit-scene" | "mid-credit-scene";
 type Stinger = { type: StingerType; note?: string };
-type ScraperResult = {
+export type ScraperResult = {
   title: string;
   link: string;
   stingers: Stinger[];

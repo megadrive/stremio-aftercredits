@@ -7,7 +7,16 @@ import type { Stream } from "stremio-addon-sdk";
 import { to } from "await-to-js";
 import ky from "ky";
 import { z } from "zod";
-import { afterCreditsScraper, mediaStingerScraper } from "./scraper.js";
+import {
+  afterCreditsScraper,
+  mediaStingerScraper,
+  type ScraperResult,
+} from "./scraper.js";
+import { createCache } from "./cache.js";
+const cache = createCache<ScraperResult>(
+  "aftercredits",
+  1000 * 60 * 60 * 24 * 7
+); // 7 days
 
 const SOURCES = [afterCreditsScraper, mediaStingerScraper];
 
@@ -43,6 +52,15 @@ const CinemetaResponseSchema = z.object({
 
 // scrape all sources for a given query in sequence
 async function scrapeAll(query: string) {
+  const cacheKey = query;
+  const cached = await cache.get(cacheKey);
+  if (cached) {
+    console.info(`Cache hit for ${query}`);
+    return cached;
+  }
+
+  console.info(`Cache miss for ${query}, scraping...`);
+
   for (const source of SOURCES) {
     let [err, result] = await to(source.scrape(query));
     if (err) {
@@ -51,6 +69,8 @@ async function scrapeAll(query: string) {
       continue;
     }
     if (result) {
+      console.info(`Scraped ${query} from ${source.constructor.name}`);
+      await cache.set(cacheKey, result);
       return result;
     }
   }
@@ -94,7 +114,7 @@ app.get("/stream/movie/:id", async (c) => {
   let [_err, scrapeResult] = await to(scrapeAll(query));
 
   if (!scrapeResult) {
-    console.info(`No aftercredits info found for ${query}`);
+    console.info(`No info found for ${query}`);
 
     return c.json({ streams: [] });
   }
@@ -104,9 +124,7 @@ app.get("/stream/movie/:id", async (c) => {
     return c.json({ streams: [] });
   }
 
-  console.info(
-    `Found aftercredits info for ${query}: ${JSON.stringify(scrapeResult)}`
-  );
+  console.info(`Found info for ${query} from ${scrapeResult.link}`);
 
   let stingers = "";
   for (const stinger of scrapeResult.stingers) {
@@ -128,9 +146,13 @@ app.get("/stream/movie/:id", async (c) => {
 serve(
   {
     fetch: app.fetch,
-    port: 3000,
+    port:
+      process.env.PORT && Number.isInteger(process.env.PORT)
+        ? +process.env.PORT
+        : 3000,
   },
   (info) => {
     console.log(`Server is running on http://localhost:${info.port}`);
+    console.info("Install URL: http://localhost:3000/manifest.json");
   }
 );
