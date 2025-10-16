@@ -61,7 +61,7 @@ class BaseScraper {
   }
 
   // Placeholder for common scraper methods and properties
-  async scrape(query: string): Promise<ScraperResult | undefined> {
+  async scrape(_query: string): Promise<ScraperResult | undefined> {
     throw new Error("Method not implemented.");
   }
 }
@@ -125,7 +125,7 @@ class AfterCreditsScraper extends BaseScraper {
     result.link = href;
     result.title = firstResult
       .text()
-      .replace(/[\*|\?]$/, "")
+      .replace(/[*|?]$/, "")
       .trim();
 
     const stingerExists = firstResult.text().includes("*");
