@@ -1,5 +1,5 @@
 import { to } from "await-to-js";
-import { load, type AcceptedElems } from "cheerio";
+import { load } from "cheerio";
 import fetch from "ky";
 
 type ScraperOptions = {
