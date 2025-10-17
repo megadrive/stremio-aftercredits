@@ -14,6 +14,7 @@ import {
   type ScraperResult,
 } from "./scraper.js";
 import { createCache } from "./cache.js";
+import { appEnv } from "./appEnv.js";
 const cache = createCache<ScraperResult>(
   "aftercredits",
   1000 * 60 * 60 * 24 * 7
@@ -53,13 +54,6 @@ const CinemetaResponseSchema = z.object({
 
 // scrape all sources for a given query in sequence
 async function scrapeAll(query: string): Promise<ScraperResult | null> {
-  const cacheKey = query;
-  const cached = await cache.get(cacheKey);
-  if ((process.env.NODE_ENV ?? "") === "production" && cached) {
-    console.info(`Cache hit for ${query}`);
-    return cached;
-  }
-
   console.info(`Cache miss for ${query}, scraping...`);
 
   for (const source of SOURCES) {
@@ -71,7 +65,6 @@ async function scrapeAll(query: string): Promise<ScraperResult | null> {
     }
     if (result) {
       console.info(`Scraped ${query} from ${source.constructor.name}`);
-      await cache.set(cacheKey, result);
       return result;
     }
   }
@@ -80,11 +73,37 @@ async function scrapeAll(query: string): Promise<ScraperResult | null> {
   return null;
 }
 
+function scrapeResultToStream(result: ScraperResult): Stream {
+  let stingers = "";
+  for (const stinger of result.stingers) {
+    stingers += `💚 ${stinger.type.replace(/-/g, " ")}\n`;
+  }
+
+  return {
+    name: "After Credits",
+    title: `Stick around for:\n${stingers.trim()}`,
+    externalUrl: result.link,
+  };
+}
+
 app.get("/stream/movie/:id", async (c) => {
   const { id } = c.req.param();
 
   // strip the .json extension if present
   const cleanId = id.replace(/\.json$/, "");
+
+  // set cache header
+  if (appEnv.isProduction) {
+    c.header("Cache-Control", "public, max-age=86400"); // cache for 1 day
+  }
+
+  // cache lookup
+  const cached = await cache.get(cleanId);
+  if (appEnv.isProduction && cached) {
+    console.info(`Cache hit for ${cleanId}`);
+    const stream = scrapeResultToStream(cached);
+    return c.json({ streams: [stream] });
+  }
 
   console.info(`Fetching aftercredits info for ${cleanId}`);
 
@@ -127,20 +146,11 @@ app.get("/stream/movie/:id", async (c) => {
 
   console.info(`Found info for ${query} from ${scrapeResult.link}`);
 
-  let stingers = "";
-  for (const stinger of scrapeResult.stingers) {
-    stingers += `💚 ${stinger.type.replace(/-/g, " ")}\n`;
-  }
+  // cache the result for future requests
+  await cache.set(cleanId, scrapeResult);
 
-  const streams: Stream = {
-    name: "After Credits",
-    title: `Stick around for:\n${stingers.trim()}`,
-    externalUrl: scrapeResult.link,
-  };
+  const streams = scrapeResultToStream(scrapeResult);
 
-  if (process.env.NODE_ENV === "production") {
-    c.header("Cache-Control", "public, max-age=86400"); // cache for 1 day
-  }
   return c.json({ streams: [streams] });
 });
 
