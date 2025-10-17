@@ -11,6 +11,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.0
         version: 1.19.1(hono@4.9.6)
+      '@keyv/redis':
+        specifier: ^5.1.3
+        version: 5.1.3(keyv@5.5.2)
       '@keyv/sqlite':
         specifier: ^4.0.5
         version: 4.0.5(keyv@5.5.2)
@@ -20,6 +23,9 @@ importers:
       cheerio:
         specifier: ^1.1.2
         version: 1.1.2
+      envalid:
+        specifier: ^8.1.0
+        version: 8.1.0
       hono:
         specifier: ^4.9.6
         version: 4.9.6
@@ -213,6 +219,12 @@ packages:
     peerDependencies:
       hono: ^4
 
+  '@keyv/redis@5.1.3':
+    resolution: {integrity: sha512-ClCCeAFMFzPH487ridqozfqb80Jdo8Uy0u2rMU18w8gFVkBhPIOz1ruEzr1hHpV8boK2PC3c9urQxXpTYHIlNQ==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      keyv: ^5.5.3
+
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
@@ -229,6 +241,10 @@ packages:
     resolution: {integrity: sha512-1SUf/Cg2GzGDyaf15aR9St9TWlb+XvbZXWpDx8YKs7MLzMH/BCeopv+y9vzrzgkfykCGuWOlSu3mZhj2+FQcrg==}
     engines: {node: '>=10'}
     deprecated: This functionality has been moved to @npmcli/fs
+
+  '@redis/client@5.8.3':
+    resolution: {integrity: sha512-MZVUE+l7LmMIYlIjubPosruJ9ltSLGFmJqsXApTqPLyHLjsJUSAbAJb/A3N34fEqean4ddiDkdWzNu4ZKPvRUg==}
+    engines: {node: '>= 18'}
 
   '@tootallnate/once@1.1.2':
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
@@ -314,6 +330,10 @@ packages:
     resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
     engines: {node: '>=6'}
 
+  cluster-key-slot@1.1.2:
+    resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
+    engines: {node: '>=0.10.0'}
+
   color-support@1.1.3:
     resolution: {integrity: sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==}
     hasBin: true
@@ -392,6 +412,10 @@ packages:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
     engines: {node: '>=6'}
 
+  envalid@8.1.0:
+    resolution: {integrity: sha512-OT6+qVhKVyCidaGoXflb2iK1tC8pd0OV2Q+v9n33wNhUJ+lus+rJobUj4vJaQBPxPZ0vYrPGuxdrenyCAIJcow==}
+    engines: {node: '>=18'}
+
   err-code@2.0.3:
     resolution: {integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==}
 
@@ -446,6 +470,9 @@ packages:
   hono@4.9.6:
     resolution: {integrity: sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA==}
     engines: {node: '>=16.9.0'}
+
+  hookified@1.12.2:
+    resolution: {integrity: sha512-aokUX1VdTpI0DUsndvW+OiwmBpKCu/NgRsSSkuSY0zq8PY6Q6a+lmOfAFDXAAOtBqJELvcWY9L1EVtzjbQcMdg==}
 
   htmlparser2@10.0.0:
     resolution: {integrity: sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==}
@@ -734,6 +761,9 @@ packages:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
 
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
   tsx@4.20.5:
     resolution: {integrity: sha512-+wKjMNU9w/EaQayHXb7WA7ZaHY6hN8WgfvHNQ3t1PnU91/7O8TcTnIhCDYTZwnt8JsO9IBqZ30Ln1r7pPF52Aw==}
     engines: {node: '>=18.0.0'}
@@ -875,6 +905,13 @@ snapshots:
     dependencies:
       hono: 4.9.6
 
+  '@keyv/redis@5.1.3(keyv@5.5.2)':
+    dependencies:
+      '@redis/client': 5.8.3
+      cluster-key-slot: 1.1.2
+      hookified: 1.12.2
+      keyv: 5.5.2
+
   '@keyv/serialize@1.1.1': {}
 
   '@keyv/sqlite@4.0.5(keyv@5.5.2)':
@@ -896,6 +933,10 @@ snapshots:
       mkdirp: 1.0.4
       rimraf: 3.0.2
     optional: true
+
+  '@redis/client@5.8.3':
+    dependencies:
+      cluster-key-slot: 1.1.2
 
   '@tootallnate/once@1.1.2':
     optional: true
@@ -1023,6 +1064,8 @@ snapshots:
   clean-stack@2.2.0:
     optional: true
 
+  cluster-key-slot@1.1.2: {}
+
   color-support@1.1.3:
     optional: true
 
@@ -1099,6 +1142,10 @@ snapshots:
 
   env-paths@2.2.1:
     optional: true
+
+  envalid@8.1.0:
+    dependencies:
+      tslib: 2.8.1
 
   err-code@2.0.3:
     optional: true
@@ -1183,6 +1230,8 @@ snapshots:
     optional: true
 
   hono@4.9.6: {}
+
+  hookified@1.12.2: {}
 
   htmlparser2@10.0.0:
     dependencies:
@@ -1561,6 +1610,8 @@ snapshots:
       minizlib: 2.1.2
       mkdirp: 1.0.4
       yallist: 4.0.0
+
+  tslib@2.8.1: {}
 
   tsx@4.20.5:
     dependencies:
