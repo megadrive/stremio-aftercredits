@@ -10,6 +10,7 @@ import { z } from "zod";
 import {
   afterCreditsScraper,
   mediaStingerScraper,
+  wikipediaScraper,
   type ScraperResult,
 } from "./scraper.js";
 import { createCache } from "./cache.js";
@@ -18,7 +19,7 @@ const cache = createCache<ScraperResult>(
   1000 * 60 * 60 * 24 * 7
 ); // 7 days
 
-const SOURCES = [afterCreditsScraper, mediaStingerScraper];
+const SOURCES = [wikipediaScraper, afterCreditsScraper, mediaStingerScraper];
 
 const app = new Hono({ strict: false });
 app.use("*", cors());
@@ -51,10 +52,10 @@ const CinemetaResponseSchema = z.object({
 });
 
 // scrape all sources for a given query in sequence
-async function scrapeAll(query: string) {
+async function scrapeAll(query: string): Promise<ScraperResult | null> {
   const cacheKey = query;
   const cached = await cache.get(cacheKey);
-  if (cached) {
+  if ((process.env.NODE_ENV ?? "") === "production" && cached) {
     console.info(`Cache hit for ${query}`);
     return cached;
   }
