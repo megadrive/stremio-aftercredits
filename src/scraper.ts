@@ -350,8 +350,6 @@ export class WikipediaScraper extends BaseScraper {
           .trim()
           .toLowerCase();
 
-        console.info({ titleText, normalizedQueryClean });
-
         if (
           titleText === normalizedQueryClean ||
           titleText.startsWith(normalizedQueryClean)
