@@ -128,7 +128,12 @@ class AfterCreditsScraper extends BaseScraper {
       .replace(/[*|?]$/, "")
       .trim();
 
-    const stingerExists = firstResult.text().includes("*");
+    // does title include split of the query
+    const queryWithoutYear = query.replace(/[0-9]{4}$/, "").trim();
+
+    const stingerExists =
+      firstResult.text().includes("*") &&
+      result.title.toLowerCase().includes(queryWithoutYear.toLowerCase());
 
     if (!stingerExists) {
       // early exit, no stingers, no need to do a detail fetch
