@@ -1,8 +1,23 @@
-```
-npm install
-npm run dev
-```
+# Stremio AfterCredits
+
+## Get mid-roll or post-credits information.
+
+🌍 https://aftercredits.almosteffective.com/
+
+### Usage
 
 ```
-open http://localhost:3000
+git clone [https://github.com/megadrive/](https://github.com/megadrive/stremio-aftercredits.git)
+cd stremio-aftercredits
+
+## production
+pnpm install
+pnpm build
+pnpm start
+
+## or for development
+pnpm install
+NODE_ENV=development pnpm dev
 ```
+
+Once the above steps are complete, will be running at [http://localhost:3000/](http://localhost:3000/)
