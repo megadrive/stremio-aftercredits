@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
-    "@keyv/redis": "^5.1.3",
-    "@keyv/sqlite": "^4.0.5",
+    "@keyv/redis": "^5.1.5",
+    "@keyv/sqlite": "^4.0.6",
     "await-to-js": "^3.0.0",
     "cheerio": "^1.1.2",
     "envalid": "^8.1.0",
-    "hono": "^4.9.6",
-    "keyv": "^5.5.2",
+    "hono": "^4.11.3",
+    "keyv": "^5.5.5",
     "ky": "^1.9.1",
     "zod": "^4.1.5"
   },
@@ -24,8 +24,7 @@
     "@types/node": "^20.11.17",
     "@types/stremio-addon-sdk": "^1.6.12",
     "tsx": "^4.7.1",
-    "typescript": "^5.8.3",
-    "vitest": "^2.1.8"
+    "typescript": "^5.8.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
