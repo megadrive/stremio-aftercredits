@@ -15,10 +15,7 @@ import {
 } from "./scraper.js";
 import { createCache } from "./cache.js";
 import { appEnv } from "./appEnv.js";
-const cache = createCache<ScraperResult>(
-  "aftercredits",
-  1000 * 60 * 60 * 24 * 7
-); // 7 days
+const cache = createCache<ScraperResult>("aftercredits");
 
 const SOURCES = [wikipediaScraper, afterCreditsScraper, mediaStingerScraper];
 
@@ -29,7 +26,7 @@ app.use(
   "*",
   serveStatic({
     root: "./static",
-  })
+  }),
 );
 
 app.get("/", (c) => {
@@ -109,7 +106,7 @@ app.get("/stream/movie/:id", async (c) => {
 
   // get details from imdbid from cinemeta
   const [cinemetaErr, cinemeta] = await to(
-    ky(`https://cinemeta-live.strem.io/meta/movie/${cleanId}.json`)
+    ky(`https://cinemeta-live.strem.io/meta/movie/${cleanId}.json`),
   );
 
   if (cinemetaErr || !cinemeta.ok) {
@@ -122,7 +119,7 @@ app.get("/stream/movie/:id", async (c) => {
   const parseResult = CinemetaResponseSchema.safeParse(cinemetaJson);
   if (!parseResult.success) {
     console.error(
-      `Cinemeta response for ${cleanId} did not match expected schema`
+      `Cinemeta response for ${cleanId} did not match expected schema`,
     );
     console.error(parseResult.error);
     return c.json({ streams: [] });
@@ -130,7 +127,8 @@ app.get("/stream/movie/:id", async (c) => {
 
   // get aftercredits details
   const { meta } = parseResult.data;
-  const query = `${meta.name} ${meta.releaseInfo ?? ""}`.trim();
+  const cleanedName = meta.name.replace(/[^a-zA-Z0-9\s]/g, "");
+  const query = `${cleanedName} ${meta.releaseInfo ?? ""}`.trim();
   let [_err, scrapeResult] = await to(scrapeAll(query));
 
   if (!scrapeResult) {
@@ -165,5 +163,5 @@ serve(
   (info) => {
     console.log(`Server is running on http://localhost:${info.port}`);
     console.info("Install URL: http://localhost:3000/manifest.json");
-  }
+  },
 );
