@@ -46,7 +46,7 @@ class BaseScraper {
         retries: 3,
         userAgent: "Stremio-AfterCredits-Scraper/1.0",
       },
-      options
+      options,
     );
   }
 
@@ -81,7 +81,7 @@ class AfterCreditsScraper extends BaseScraper {
   async scrape(query: string): Promise<ScraperResult | undefined> {
     const searchUrl = this.path("search").replace(
       "%s",
-      encodeURIComponent(query)
+      encodeURIComponent(query),
     );
 
     const result: ScraperResult = {
@@ -94,7 +94,7 @@ class AfterCreditsScraper extends BaseScraper {
 
     if (htmlErr) {
       console.error(
-        `Error fetching HTML from ${searchUrl}: ${htmlErr.message}`
+        `Error fetching HTML from ${searchUrl}: ${htmlErr.message}`,
       );
 
       return undefined;
@@ -191,7 +191,7 @@ class MediaStingerScraper extends BaseScraper {
   async scrape(query: string): Promise<ScraperResult | undefined> {
     const searchUrl = this.path("search").replace(
       "%s",
-      encodeURIComponent(query)
+      encodeURIComponent(query),
     );
 
     const result: ScraperResult = {
@@ -204,7 +204,7 @@ class MediaStingerScraper extends BaseScraper {
 
     if (htmlErr) {
       console.error(
-        `Error fetching HTML from ${searchUrl}: ${htmlErr.message}`
+        `Error fetching HTML from ${searchUrl}: ${htmlErr.message}`,
       );
 
       return undefined;
@@ -225,7 +225,11 @@ class MediaStingerScraper extends BaseScraper {
     result.title = $result.find(".title").first().text().trim();
 
     const $subtitle = $result.find(".subtitle").first().text().trim();
-    const stingerExists = !$subtitle.toLowerCase().trim().startsWith("no");
+    const stingerExists = !$subtitle
+      .toLowerCase()
+      .trim()
+      .toLowerCase()
+      .includes("no");
 
     if (!stingerExists) {
       // early exit, no stingers, no need to do a detail fetch
@@ -281,14 +285,14 @@ export class WikipediaScraper extends BaseScraper {
 
     if (htmlErr) {
       console.error(
-        `Error fetching HTML from ${this.options.baseUrl}: ${htmlErr.message}`
+        `Error fetching HTML from ${this.options.baseUrl}: ${htmlErr.message}`,
       );
       return;
     }
 
     this.cache = { html, time: Date.now() };
     console.info(
-      `Fetched HTML from ${this.options.baseUrl}. Length: ${html.length}`
+      `Fetched HTML from ${this.options.baseUrl}. Length: ${html.length}`,
     );
   }
 
