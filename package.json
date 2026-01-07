@@ -5,7 +5,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "stremio:publish": "tsx src/publishToStremio.ts"
+    "stremio:publish": "tsx src/publishToStremio.ts",
+    "test": "vitest"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
@@ -23,7 +24,8 @@
     "@types/node": "^20.11.17",
     "@types/stremio-addon-sdk": "^1.6.12",
     "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.8"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
