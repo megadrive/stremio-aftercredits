@@ -11,13 +11,20 @@ import {
   afterCreditsScraper,
   mediaStingerScraper,
   wikipediaScraper,
+  tmdbScraper,
   type ScraperResult,
-} from "./scraper.js";
+} from "./scrapers/allScrapers.js";
 import { createCache } from "./cache.js";
 import { appEnv } from "./appEnv.js";
+import type { SearchInfo } from "./scrapers/_base.js";
 const cache = createCache<ScraperResult>("aftercredits");
 
-const SOURCES = [wikipediaScraper, afterCreditsScraper, mediaStingerScraper];
+const SOURCES = [
+  tmdbScraper,
+  wikipediaScraper,
+  afterCreditsScraper,
+  mediaStingerScraper,
+];
 
 const app = new Hono({ strict: false });
 app.use("*", cors());
@@ -50,8 +57,8 @@ const CinemetaResponseSchema = z.object({
 });
 
 // scrape all sources for a given query in sequence
-async function scrapeAll(query: string): Promise<ScraperResult | null> {
-  console.info(`Cache miss for ${query}, scraping...`);
+async function scrapeAll(query: SearchInfo): Promise<ScraperResult | null> {
+  console.info(`Cache miss for ${query.query}, scraping...`);
 
   for (const source of SOURCES) {
     let [err, result] = await to(source.scrape(query));
@@ -66,7 +73,7 @@ async function scrapeAll(query: string): Promise<ScraperResult | null> {
     }
   }
 
-  console.info(`No aftercredits info found for ${query}`);
+  console.info(`No aftercredits info found for ${query.query}`);
   return null;
 }
 
@@ -129,7 +136,14 @@ app.get("/stream/movie/:id", async (c) => {
   const { meta } = parseResult.data;
   const cleanedName = meta.name.replace(/[^a-zA-Z0-9\s]/g, "");
   const query = `${cleanedName} ${meta.releaseInfo ?? ""}`.trim();
-  let [_err, scrapeResult] = await to(scrapeAll(query));
+  let [_err, scrapeResult] = await to(
+    scrapeAll({
+      query,
+      title: meta.name,
+      imdbId: cleanId,
+      year: meta.releaseInfo ?? "",
+    }),
+  );
 
   if (!scrapeResult) {
     console.info(`No info found for ${query}`);
