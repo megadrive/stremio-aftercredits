@@ -63,12 +63,14 @@ async function scrapeAll(query: SearchInfo): Promise<ScraperResult | null> {
   for (const source of SOURCES) {
     let [err, result] = await to(source.scrape(query));
     if (err) {
-      console.error(`Error scraping ${query} from ${source.constructor.name}`);
+      console.error(
+        `Error scraping ${query.query} from ${source.constructor.name}`,
+      );
       console.error(err);
       continue;
     }
     if (result) {
-      console.info(`Scraped ${query} from ${source.constructor.name}`);
+      console.info(`Scraped ${query.query} from ${source.constructor.name}`);
       return result;
     }
   }
