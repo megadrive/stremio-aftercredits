@@ -7,13 +7,14 @@
 ### Usage
 
 ```
-git clone [https://github.com/megadrive/](https://github.com/megadrive/stremio-aftercredits.git)
+git clone https://github.com/megadrive/stremio-aftercredits.git
 cd stremio-aftercredits
 
 ## production
 pnpm install
 pnpm build
 pnpm start
+# or pnpm start:tsx
 
 ## or for development
 pnpm install
