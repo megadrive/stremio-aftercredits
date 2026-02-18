@@ -7,24 +7,11 @@ import type { Stream } from "stremio-addon-sdk";
 import { to } from "await-to-js";
 import ky from "ky";
 import { z } from "zod";
-import {
-  afterCreditsScraper,
-  mediaStingerScraper,
-  wikipediaScraper,
-  tmdbScraper,
-  type ScraperResult,
-} from "./scrapers/allScrapers.js";
+import { SOURCES, type ScraperResult } from "./scrapers/allScrapers.js";
 import { createCache } from "./cache.js";
 import { appEnv } from "./appEnv.js";
 import type { SearchInfo } from "./scrapers/_base.js";
 const cache = createCache<ScraperResult>("aftercredits");
-
-const SOURCES = [
-  tmdbScraper,
-  wikipediaScraper,
-  afterCreditsScraper,
-  mediaStingerScraper,
-];
 
 const app = new Hono({ strict: false });
 app.use("*", cors());
@@ -34,6 +21,11 @@ app.use(
   serveStatic({
     root: "./static",
   }),
+);
+
+// output some debug info
+console.log(
+  `Source order: ${SOURCES.map((source) => source.options.name).join(", ")}`,
 );
 
 app.get("/", (c) => {
@@ -108,6 +100,7 @@ app.get("/stream/movie/:id", async (c) => {
   if (appEnv.isProduction && cached) {
     console.info(`Cache hit for ${cleanId}`);
     const stream = scrapeResultToStream(cached);
+    c.header("X-AfterCredits-Source", "Cached");
     return c.json({ streams: [stream] });
   }
 

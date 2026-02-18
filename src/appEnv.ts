@@ -10,4 +10,5 @@ export const appEnv = cleanEnv(process.env, {
   SQLITE_PATH: str({ default: "./cache.sqlite" }),
   CACHE_TTL: num({ default: ONE_DAY_MS * 7, devDefault: 0 }),
   TMDB_APIKEY: str({ default: "" }),
+  SOURCE_ORDER: str({ default: "tmdb,aftercredits,mediastinger,wikipedia" }),
 });
