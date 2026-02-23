@@ -60,7 +60,6 @@ export class TmdbScraper extends BaseScraper {
     if (!imdb) {
       this.log(`no tmdb found for ${query.imdbId}, fetching from tmdb`);
       const url = this.path("externalIds").replace(/%s/g, query.imdbId);
-      console.log(url);
       const [imdbResultErr, imdbResult] = await to(
         fetch(url, {
           headers: {
@@ -107,7 +106,6 @@ export class TmdbScraper extends BaseScraper {
     }
 
     const data = await response.json();
-    console.log(data);
     const parsed = MovieResponseSchema.safeParse(data);
     if (!parsed.success) {
       this.log("Invalid response from TMDB API");
@@ -121,7 +119,6 @@ export class TmdbScraper extends BaseScraper {
     };
 
     parsed.data.keywords.keywords.forEach((keyword) => {
-      console.info(keyword.name);
       switch (keyword.name) {
         case "duringcreditsstinger":
           stingers.stingers.push({
