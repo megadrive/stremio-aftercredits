@@ -1,7 +1,7 @@
 import Keyv from "keyv";
 import KeyvSqlite from "@keyv/sqlite";
 import KeyvRedis from "@keyv/redis";
-import { appEnv } from "./appEnv.js";
+import { appEnv } from "@/appEnv.js";
 
 const cacheStore = <T>(namespace?: string) => {
   if (appEnv.DATABASE_TYPE === "redis") {
@@ -16,7 +16,7 @@ const cacheStore = <T>(namespace?: string) => {
 
 export const createCache = <T>(namespace: string, ttl = appEnv.CACHE_TTL) => {
   console.info(
-    `Using ${appEnv.DATABASE_TYPE} for caching (${namespace}) (TTL: ${ttl} ms)`,
+    `Using ${appEnv.DATABASE_TYPE} for caching (prefix: ${namespace}) (TTL: ${ttl} ms)`,
   );
 
   return new Keyv<T>({

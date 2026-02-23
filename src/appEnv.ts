@@ -11,4 +11,5 @@ export const appEnv = cleanEnv(process.env, {
   CACHE_TTL: num({ default: ONE_DAY_MS * 7, devDefault: 0 }),
   TMDB_APIKEY: str({ default: "" }),
   SOURCE_ORDER: str({ default: "tmdb,aftercredits,mediastinger,wikipedia" }),
+  SHOW_NO_STINGERS: str({ default: "false", choices: ["true", "false"] }),
 });
