@@ -42,7 +42,7 @@ serve(
     port: appEnv.PORT,
   },
   (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
-    console.info("Install URL: http://localhost:3000/manifest.json");
+    console.info(`Server is running on http://localhost:${info.port}`);
+    console.info(`Install URL: http://localhost:${info.port}/manifest.json`);
   },
 );
