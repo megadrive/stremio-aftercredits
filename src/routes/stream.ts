@@ -12,6 +12,10 @@ const cache = createCache<ScraperResult>("stingers");
 
 const app = new Hono();
 
+console.info(
+  `Scrapers registered: ${SOURCES.map((s) => s.constructor.name).join(", ")}`,
+);
+
 // scrape all sources for a given query in sequence
 async function scrapeAll(query: SearchInfo): Promise<ScraperResult | null> {
   console.info(`Cache miss for ${query.query}, scraping...`);

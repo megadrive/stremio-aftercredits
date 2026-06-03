@@ -133,7 +133,7 @@ export class TmdbScraper extends BaseScraper {
       }
     });
 
-    return stingers;
+    return stingers.stingers.length ? stingers : undefined;
   }
 }
 
