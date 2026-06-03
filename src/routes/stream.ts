@@ -16,28 +16,47 @@ console.info(
   `Scrapers registered: ${SOURCES.map((s) => s.constructor.name).join(", ")}`,
 );
 
-// scrape all sources for a given query in sequence
+// scrape all sources for a given query in parallel, returning the first successful result
 async function scrapeAll(query: SearchInfo): Promise<ScraperResult | null> {
   console.info(`Cache miss for ${query.query}, scraping...`);
 
-  for (const source of SOURCES) {
+  // Create promises for all scrapers to run in parallel
+  const scraperPromises = SOURCES.map(async (source) => {
     console.info(`Scraping ${source.constructor.name} for ${query.query}`);
-    let [err, result] = await to(source.scrape(query));
-    if (err) {
+
+    try {
+      // Attempt to scrape from this source
+      const result = await source.scrape(query);
+
+      if (result) {
+        console.info(`Scraped ${query.query} from ${source.constructor.name}`);
+        return result;
+      }
+      // If result is null, throw to signal this scraper didn't find anything
+      throw new Error(`No result from ${source.constructor.name}`);
+    } catch (err) {
       console.error(
         `Error scraping ${query.query} from ${source.constructor.name}`,
       );
       console.error(err);
-      continue;
+      // Re-throw so Promise.any can try the next scraper
+      throw err;
     }
-    if (result) {
-      console.info(`Scraped ${query.query} from ${source.constructor.name}`);
-      return result;
-    }
-  }
+  });
 
-  console.info(`No stinger info found for ${query.query}`);
-  return null;
+  try {
+    // Promise.any resolves with the first successful result, rejects only if all fail
+    const result = await Promise.any(scraperPromises);
+    return result;
+  } catch (err) {
+    // AggregateError is thrown when all promises reject
+    if (err instanceof AggregateError) {
+      console.info(`No stinger info found for ${query.query}`);
+    } else {
+      console.error(`Unexpected error in scrapeAll:`, err);
+    }
+    return null;
+  }
 }
 
 const STREAM: Stream = {
